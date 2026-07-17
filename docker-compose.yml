@@ -1,0 +1,12 @@
+services:
+  skypane:
+    build: .
+    image: skypane:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      # - ADSB_POLL_MS=10000
+      # - AEROAPI_KEY=your-flightaware-aeroapi-key
+    # Serve behind your own reverse proxy (nginx/Caddy/Traefik) for TLS.

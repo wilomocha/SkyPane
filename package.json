@@ -1,0 +1,17 @@
+{
+  "name": "skypane",
+  "version": "1.0.0",
+  "description": "SkyPane — a software-only live flight-watch board for any screen. Tracks the single aircraft inside a small watch zone using live ADS-B data.",
+  "license": "MIT",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  }
+}
