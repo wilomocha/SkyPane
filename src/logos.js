@@ -19,6 +19,8 @@ const REMOTE_TEMPLATE = process.env.AIRLINE_LOGO_URL_TEMPLATE || '';
 
 const LOGO_DIR = path.join(__dirname, '..', 'public', 'logos');
 let index = new Map(); // lowercased basename (no ext) -> "/logos/<file>"
+let lastSignature = null; // to log only when the set of logos actually changes
+let watchTimer = null;
 
 // Build an index of available local logo files. Called at startup and can be
 // re-run to pick up newly added files without a restart.
@@ -42,8 +44,24 @@ function scanLogos() {
     const base = slug(path.basename(file, path.extname(file)));
     index.set(base, `/logos/${file}`);
   }
-  console.log(`[logos] indexed ${index.size} airline logo file(s) from public/logos/`);
+  // Only log when the set of indexed logos actually changed (so the periodic
+  // re-scan doesn't spam the log).
+  const signature = [...index.keys()].sort().join(',');
+  if (signature !== lastSignature) {
+    lastSignature = signature;
+    console.log(`[logos] indexed ${index.size} airline logo file(s) from public/logos/`);
+  }
   return index.size;
+}
+
+// Periodically re-scan the logos directory so files dropped in at runtime (e.g.
+// into a Docker bind-mount) are picked up without restarting. Set
+// LOGO_RESCAN_MS=0 to disable. Cheap: it just reads a small directory listing.
+function startLogoWatch() {
+  const intervalMs = Number(process.env.LOGO_RESCAN_MS ?? 30000);
+  if (watchTimer || !intervalMs || intervalMs < 0) return;
+  watchTimer = setInterval(scanLogos, intervalMs);
+  if (watchTimer.unref) watchTimer.unref(); // don't keep the process alive for this
 }
 
 function slug(s) {
@@ -71,4 +89,4 @@ function logoForAirline(icao, callsign, name) {
   return null;
 }
 
-module.exports = { scanLogos, logoForAirline };
+module.exports = { scanLogos, startLogoWatch, logoForAirline };
