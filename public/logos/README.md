@@ -21,8 +21,22 @@ and then dotted by the LED grid to match the board's look.
 
 ## Applying changes
 
-Logos are indexed when the server starts, so **restart the server** after adding
-or renaming files.
+Logos are indexed at startup and **re-scanned automatically** (every ~30s, set by
+`LOGO_RESCAN_MS`), so a file you drop in here appears on the board within about
+half a minute — no restart needed.
+
+### Running in Docker
+
+Inside a container this folder lives in the image, so mount a host folder onto it
+and drop your logos there. In `docker-compose.yml` (already configured):
+
+```yaml
+    volumes:
+      - ./logos:/app/public/logos
+```
+
+Then put `UAL.png`, `SWA.png`, … in the `./logos` folder next to your compose
+file. They're picked up automatically (no `docker restart` required).
 
 ## Optional: remote logo source
 
