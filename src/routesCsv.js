@@ -32,6 +32,8 @@ const COLUMNS = {
 };
 
 let index = new Map(); // normalized callsign -> route object
+let lastMtimeMs = -1; // file mtime we last loaded, to skip unchanged re-reads
+let watchTimer = null;
 
 // Minimal RFC-4180-ish CSV parser (handles quoted fields, escaped quotes, CRLF).
 function parseCsv(text) {
@@ -138,6 +140,24 @@ function loadRoutesCsv() {
   return count;
 }
 
+// Periodically reload the CSV if its modification time changed, so edits to a
+// mounted routes.csv (e.g. a Docker bind-mount) apply without a restart. Set
+// ROUTES_CSV_RESCAN_MS=0 to disable.
+function startRoutesCsvWatch() {
+  const intervalMs = Number(process.env.ROUTES_CSV_RESCAN_MS ?? 30000);
+  if (watchTimer || !intervalMs || intervalMs < 0) return;
+  try { lastMtimeMs = fs.statSync(CSV_PATH).mtimeMs; } catch { lastMtimeMs = -1; }
+  watchTimer = setInterval(() => {
+    let mtime = -1;
+    try { mtime = fs.statSync(CSV_PATH).mtimeMs; } catch { mtime = -1; }
+    if (mtime !== lastMtimeMs) {
+      lastMtimeMs = mtime;
+      loadRoutesCsv();
+    }
+  }, intervalMs);
+  if (watchTimer.unref) watchTimer.unref();
+}
+
 function lookupRouteCsv(callsign) {
   if (!callsign) return null;
   return index.get(normCallsign(callsign)) || null;
@@ -148,4 +168,4 @@ function csvOverride() {
   return String(process.env.ROUTE_CSV_OVERRIDE || '').toLowerCase() === 'true';
 }
 
-module.exports = { loadRoutesCsv, lookupRouteCsv, csvOverride };
+module.exports = { loadRoutesCsv, startRoutesCsvWatch, lookupRouteCsv, csvOverride };
