@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SkyPane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="/styles.css">
+<script src="/vendor/leaflet/leaflet.js"></script>
+</head>
+<body>
+
+<div id="stage">
+  <div id="bezel">
+    <div id="board">
+
+      <div class="om-dotbg"></div>
+
+      <div id="content">
+
+        <div class="header-row">
+          <div class="zone-info">
+            <div id="live-dot" class="live-dot"></div>
+            <div id="zone-line" class="zone-line">WATCH ZONE</div>
+            <div id="source-badge" class="source-badge" hidden></div>
+          </div>
+          <div class="clock-block">
+            <div id="clock-line" class="clock-line">&nbsp;</div>
+            <div id="tz-line" class="tz-line">&nbsp;</div>
+          </div>
+        </div>
+
+        <div id="plane-panel" class="plane-panel" hidden>
+
+          <div id="top-block" class="top-block">
+            <div id="emblem" class="emblem">
+              <img id="emblem-logo" class="emblem-logo" hidden alt="">
+              <div id="emblem-generic" class="emblem-generic" hidden>
+                <div class="emblem-generic-shape"></div>
+              </div>
+              <div id="emblem-airline" class="emblem-airline" hidden>
+                <div class="globe-ring"></div>
+                <div class="globe-ring-thin"></div>
+                <div class="globe-eq"></div>
+                <div class="globe-lat globe-lat-top"></div>
+                <div class="globe-lat globe-lat-bot"></div>
+              </div>
+            </div>
+
+            <div class="identity-block">
+              <div id="airline-name" class="airline-name fit"><span class="fit-inner">&nbsp;</span></div>
+              <div id="route" class="route">&nbsp;</div>
+              <div id="ac-type" class="ac-type fit"><span class="fit-inner">&nbsp;</span></div>
+            </div>
+
+            <div class="right-block">
+              <div class="right-top">
+                <div id="flight-no" class="flight-no">&nbsp;</div>
+                <div id="tail" class="tail">&nbsp;</div>
+                <div id="status-label" class="status-label">&nbsp;</div>
+              </div>
+              <div class="dest-row">
+                <span id="dest-flag" class="dest-flag"></span>
+                <span id="dest-name" class="dest-name fit"><span class="fit-inner">&nbsp;</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="metrics-grid">
+            <div class="metric-row">
+              <div class="metric"><span class="metric-label">ALT</span><span id="m-alt" class="metric-value">—</span></div>
+              <div class="metric"><span class="metric-label">SPD</span><span id="m-spd" class="metric-value">—</span></div>
+              <div class="metric"><span class="metric-label">TRK</span><span id="m-trk" class="metric-value">—</span></div>
+            </div>
+            <div class="metric-row">
+              <div class="metric"><span class="metric-label">V/R</span><span id="m-vr" class="metric-value">—</span></div>
+              <div class="metric"><span class="metric-label">DTG</span><span id="m-dtg" class="metric-value">—</span></div>
+              <div class="metric"><span class="metric-label">ETA</span><span id="m-eta" class="metric-value">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="standby-panel" class="standby-panel">
+          <div id="standby-title" class="standby-title">CONNECTING</div>
+          <div class="standby-sub">STANDING BY</div>
+        </div>
+
+      </div>
+
+      <button id="change-zone-btn" class="change-zone-btn">CHANGE ZONE</button>
+      <button id="fullscreen-btn" class="fullscreen-btn" title="Toggle fullscreen (F)" aria-label="Toggle fullscreen">⤢</button>
+
+      <div class="om-ledmask"></div>
+
+      <div id="fx-scanlines" class="fx-scanlines"></div>
+      <div id="fx-vignette" class="fx-vignette"></div>
+
+    </div>
+  </div>
+</div>
+
+<div id="picker-overlay" class="picker-overlay" hidden>
+  <div id="picker-modal" class="picker-modal">
+    <div class="picker-title">SELECT AIRSPACE</div>
+    <div class="picker-desc">Click or drag the map to place the watch zone; use the slider for its radius. A small zone with an altitude bracket keeps a single aircraft in view at a time.</div>
+
+    <div class="picker-fields">
+      <div id="map" class="picker-map"></div>
+      <div id="map-fallback" class="map-fallback" hidden>Map tiles couldn't load (offline or blocked). Use the LAT/LON fields below.</div>
+
+      <div class="radius-row">
+        <div class="radius-readout">
+          <div class="field-label">RADIUS</div>
+          <div id="radius-label" class="radius-label">2.0 NM</div>
+          <div id="area-label" class="area-label">≈ 0.0 sq mi</div>
+        </div>
+        <input id="radius-slider" class="radius-slider" type="range" min="0.3" max="25" step="0.1" value="2">
+      </div>
+
+      <div class="field-pair">
+        <label class="field">
+          <div class="field-label">ALT FLOOR (ft)</div>
+          <input id="alt-floor-input" type="number" step="500">
+        </label>
+        <label class="field">
+          <div class="field-label">ALT CEIL (ft)</div>
+          <input id="alt-ceil-input" type="number" step="500">
+        </label>
+      </div>
+      <div class="picker-divider">
+        <div class="field-label">COORDINATES</div>
+        <div class="field-pair">
+          <label class="field">
+            <div class="field-label">LAT</div>
+            <input id="lat-input" type="number" step="0.000001">
+          </label>
+          <label class="field">
+            <div class="field-label">LON</div>
+            <input id="lon-input" type="number" step="0.000001">
+          </label>
+        </div>
+      </div>
+      <div class="picker-divider">
+        <div class="field-label">DISPLAY</div>
+        <div id="accent-swatches" class="accent-swatches"></div>
+        <div class="field-pair" style="margin-top:10px">
+          <label class="field">
+            <div class="field-label">UNITS</div>
+            <select id="units-input">
+              <option value="imperial">Imperial</option>
+              <option value="metric">Metric</option>
+            </select>
+          </label>
+          <label class="field field-checkbox">
+            <input id="effects-input" type="checkbox">
+            <span>Screen effects</span>
+          </label>
+        </div>
+      </div>
+      <button id="apply-btn" class="apply-btn">APPLY</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+callsign,airline,airline_icao,origin,origin_city,origin_country,origin_lat,origin_lon,dest,dest_city,dest_country,dest_lat,dest_lon
+UAL809,UNITED,UAL,SFO,San Francisco,US,37.6213,-122.3790,MNL,Manila,PH,14.5086,121.0198
