@@ -7,13 +7,17 @@ const http = require('http');
 const express = require('express');
 const { WebSocketServer } = require('ws');
 const { ZoneManager } = require('./src/zoneManager');
-const { scanLogos } = require('./src/logos');
-const { loadRoutesCsv } = require('./src/routesCsv');
+const { scanLogos, startLogoWatch } = require('./src/logos');
+const { loadRoutesCsv, startRoutesCsvWatch } = require('./src/routesCsv');
 
 const PORT = Number(process.env.PORT) || 3000;
 
-scanLogos(); // index any user-provided airline logos in public/logos/
-loadRoutesCsv(); // load any user-supplied route corrections from data/routes.csv
+// Index user-provided airline logos + route corrections, then keep watching them
+// so files added/edited at runtime (e.g. Docker bind-mounts) apply without a restart.
+scanLogos();
+startLogoWatch();
+loadRoutesCsv();
+startRoutesCsvWatch();
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
