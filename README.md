@@ -1,4 +1,8 @@
 # SkyPane
+[![CI](https://github.com/wilomocha/SkyPane/actions/workflows/docker.yml/badge.svg)](https://github.com/wilomocha/SkyPane/actions/workflows/docker.yml)
+[![Release](https://img.shields.io/github/v/release/wilomocha/SkyPane)](https://github.com/wilomocha/SkyPane/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
 
 **A live flight-watch display for any pane** — your laptop, a spare monitor, a tablet
 propped on a shelf, a TV, whatever screen you already own. No dedicated hardware required.
