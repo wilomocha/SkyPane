@@ -198,6 +198,8 @@ inline. Highlights:
 | `AIRFRAMES_API_KEY` | _(empty)_ | Enables the airframes.io backup route source. |
 | `AEROAPI_KEY` | _(empty)_ | Enables the FlightAware AeroAPI last-resort route source (paid). |
 | `ROUTES_CSV_PATH` / `ROUTE_CSV_OVERRIDE` | `data/routes.csv` / `false` | Your own route corrections. |
+| `AIRLINE_LOGO_URL_TEMPLATE` | _(empty)_ | Fallback remote logo URL with {icao} / {name} placeholders, used when no local public/logos/ file matches (e.g. https://logos.example.com/{icao}.png). Loaded by the viewer's browser; local files win. |
+| `LOGO_RESCAN_MS / ROUTES_CSV_RESCAN_MS` | `30000` | How often (ms) logos / route CSV are re-scanned for changes; 0 disables. |
 
 **API keys** live server-side only (never sent to the browser). See
 [`.env.example`](.env.example) for the full list and base-URL overrides,
