@@ -2,11 +2,24 @@ services:
   skypane:
     build: .
     image: skypane:latest
+    # To run a published image instead of building locally, remove `build: .`
+    # above and set e.g. image: ghcr.io/<your-username>/skypane:latest
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - PORT=3000
       # - ADSB_POLL_MS=10000
+      # API keys (or load them from a .env file via env_file below):
+      # - AIRFRAMES_API_KEY=your-airframes-key
       # - AEROAPI_KEY=your-flightaware-aeroapi-key
+    # env_file:            # optional: put keys/settings in a local .env and uncomment
+    #   - .env
+    volumes:
+      # Airline logos: drop UAL.png, SWA.png, ... into ./logos on the host.
+      # Picked up automatically (no restart) — see public/logos/README.md for naming.
+      - ./logos:/app/public/logos
+      # Route corrections: put your routes.csv in ./data on the host.
+      # Reloaded automatically when it changes — see data/README.md for the format.
+      - ./data:/app/data
     # Serve behind your own reverse proxy (nginx/Caddy/Traefik) for TLS.
