@@ -1,0 +1,18 @@
+node_modules/
+
+# local secrets / config
+.env
+.env.*
+!.env.example
+
+# logs & OS cruft
+*.log
+npm-debug.log*
+.DS_Store
+
+# build artifacts
+*.zip
+
+# user-provided runtime assets (keep the folders + their READMEs, ignore content)
+public/logos/*
+!public/logos/README.md
