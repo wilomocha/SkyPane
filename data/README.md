@@ -41,8 +41,20 @@ Common column aliases are accepted (e.g. `flight`, `from`/`to`,
 
 ## Applying changes
 
-The CSV is read at startup, so **restart the server** after editing it. Point
-`ROUTES_CSV_PATH` at a different file if you keep it elsewhere.
+The CSV is loaded at startup and **reloaded automatically** when it changes (every
+~30s, set by `ROUTES_CSV_RESCAN_MS`) — no restart needed. Point `ROUTES_CSV_PATH`
+at a different file if you keep it elsewhere.
+
+**In Docker**, mount a host folder onto `/app/data` so you can edit the file from
+the host (already configured in `docker-compose.yml`):
+
+```yaml
+    volumes:
+      - ./data:/app/data
+```
+
+Put your `routes.csv` in the `./data` folder next to your compose file. (Mounting
+an empty `./data` simply means no corrections are loaded until you add the file.)
 
 The example row shipped here (`UAL809` → SFO–MNL) is just a template — edit or
 replace it with your own flights.
