@@ -160,6 +160,10 @@ docker build -t skypane .
 docker run -d --name skypane -p 3000:3000 --restart unless-stopped skypane
 ```
 
+or via GitHub's Docker registry (ghcr.io):
+```bash
+docker pull ghcr.io/wilomocha/skypane:latest
+```
 ---
 
 ## Configuration
